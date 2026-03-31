@@ -32,6 +32,9 @@ export function GameScreen({ ornament, progress, animationSystem, sound, onCompl
   updateStitchSize();
   window.addEventListener('resize', updateStitchSize);
 
+  pieceWrap.style.position = 'relative';
+  pieceWrap.style.minHeight = '300px';
+
   const slots = ornament.parts.map((part) => {
     const slot = document.createElement('div');
     slot.className = 'slot';
@@ -43,12 +46,17 @@ export function GameScreen({ ornament, progress, animationSystem, sound, onCompl
   });
 
   const dd = new DragDropEngine(el);
-  ornament.parts.forEach((part, idx) => {
+  const shuffledParts = [...ornament.parts].sort(() => Math.random() - 0.5);
+  shuffledParts.forEach((part, idx) => {
     const piece = document.createElement('div');
     piece.className = 'piece';
     piece.dataset.id = part.id;
-    piece.textContent = idx + 1;
+    piece.innerHTML = `<span>${idx + 1}</span>`;
     piece.style.background = part.color;
+    piece.style.backgroundImage = triangleMosaic(part.color, idx + 1);
+    piece.style.position = 'absolute';
+    piece.style.left = `${10 + Math.random() * 160}px`;
+    piece.style.top = `${8 + Math.random() * 220}px`;
     pieceWrap.appendChild(piece);
 
     dd.makeDraggable(piece, ({ x, y, node }) => {
@@ -63,7 +71,9 @@ export function GameScreen({ ornament, progress, animationSystem, sound, onCompl
         sound.stitch();
         drawStitchLine(node, snap);
       } else {
-        node.style.position = 'static';
+        node.style.position = 'absolute';
+        node.style.left = `${10 + Math.random() * 160}px`;
+        node.style.top = `${8 + Math.random() * 220}px`;
       }
       pbar.style.width = `${Math.floor(puzzle.progress * 100)}%`;
       if (puzzle.isComplete()) setTimeout(() => onComplete(), 450);
@@ -83,4 +93,25 @@ export function GameScreen({ ornament, progress, animationSystem, sound, onCompl
   }
 
   return el;
+}
+
+function triangleMosaic(base, seed) {
+  const c = (delta) => shade(base, delta);
+  const triangles = [
+    `polygon(0 0, 50% 0, 0 50%) ${c(seed * 3)}`,
+    `polygon(50% 0, 100% 0, 100% 50%) ${c(-10)}`,
+    `polygon(0 50%, 50% 100%, 0 100%) ${c(12)}`,
+    `polygon(100% 50%, 50% 100%, 100% 100%) ${c(-18)}`,
+    `polygon(50% 0, 100% 50%, 50% 50%) ${c(20)}`,
+    `polygon(0 50%, 50% 50%, 50% 100%) ${c(-4)}`
+  ];
+  return `conic-gradient(from 45deg, ${triangles.map((t, i) => `${t.split(') ')[1]} ${i * 60}deg ${(i + 1) * 60}deg`).join(',')})`;
+}
+
+function shade(hex, delta) {
+  const n = hex.replace('#', '');
+  const r = Math.max(0, Math.min(255, parseInt(n.slice(0, 2), 16) + delta));
+  const g = Math.max(0, Math.min(255, parseInt(n.slice(2, 4), 16) + delta));
+  const b = Math.max(0, Math.min(255, parseInt(n.slice(4, 6), 16) + delta));
+  return `rgb(${r}, ${g}, ${b})`;
 }

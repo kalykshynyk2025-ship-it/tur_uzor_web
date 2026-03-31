@@ -108,6 +108,8 @@ button:hover { filter: brightness(1.08); transform: translateY(-1px); }
   align-content: flex-start;
   overflow: auto;
   background: rgba(255,255,255,.75);
+  position: relative;
+  min-height: 300px;
 }
 
 .piece {
@@ -122,7 +124,10 @@ button:hover { filter: brightness(1.08); transform: translateY(-1px); }
   touch-action: none;
   cursor: grab;
   transition: transform .15s, box-shadow .15s;
+  display: grid;
+  place-items: center;
 }
+.piece span { background: rgba(0,0,0,.25); padding: 2px 7px; border-radius: 999px; }
 .piece:hover { transform: scale(1.06); box-shadow: 0 8px 16px rgba(0,0,0,.15); }
 .piece.dragging { cursor: grabbing; opacity: .9; }
 
