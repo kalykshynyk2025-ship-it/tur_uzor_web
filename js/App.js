@@ -112,7 +112,9 @@ export class App {
     if (this.state.screen === 'mini') {
       this.mount(EmbroideryMiniGame({
         sound: this.sound,
-        onBack: () => this.setScreen('quiz'),
+        // После завершения квиза возврат в него невозможен (вопросов больше нет),
+        // поэтому кнопка "Назад" ведёт на стартовый экран.
+        onBack: () => this.setScreen('start'),
         onComplete: () => {
           this.patchProgress(20, 1);
           this.setScreen('reward');

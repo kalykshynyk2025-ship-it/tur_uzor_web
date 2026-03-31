@@ -24,7 +24,9 @@ export function EmbroideryMiniGame({ onComplete, onBack, sound }) {
     draw();
   }
   window.addEventListener('resize', resize);
-  resize();
+  // В момент создания экран ещё не вставлен в DOM, поэтому clientWidth/clientHeight
+  // могут быть нулевыми. Откладываем первый resize до следующего кадра.
+  requestAnimationFrame(resize);
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
